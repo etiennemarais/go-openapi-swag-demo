@@ -1,0 +1,14 @@
+name: Swagger
+on: [push]
+jobs:
+  documentation:
+    name: Documentation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-go@v2
+        with:
+          go-version: 1.15
+      - uses: actions/checkout@v2
+      - run: go mod download
+      - run: go get -u github.com/swaggo/swag/cmd/swag
+      - run: swag init -g pkg/router/router.go
