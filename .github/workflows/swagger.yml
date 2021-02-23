@@ -12,3 +12,15 @@ jobs:
       - run: go mod download
       - run: go get -u github.com/swaggo/swag/cmd/swag
       - run: swag init -g pkg/router/router.go
+      - run: mkdir output && cp docs/swagger.yaml output/${{ github.event.repository.name }}.yaml
+      # force push into ui repo via this action
+      - name: Pushes to another repository
+        uses: cpina/github-action-push-to-another-repository@v1.2
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
+        with:
+          source-directory: 'output'
+          destination-github-username: 'etiennemarais'
+          destination-repository-name: 'go-openapi-swag-ui-demo/services'
+          target-branch: 'main'
+          user-email: hello@etiennemarais.co.za
