@@ -21,6 +21,6 @@ jobs:
         with:
           source-directory: 'output'
           destination-github-username: 'etiennemarais'
-          destination-repository-name: 'go-openapi-swag-ui-demo/services'
+          destination-repository-name: 'go-openapi-swag-ui-demo'
           target-branch: 'main'
           user-email: hello@etiennemarais.co.za
