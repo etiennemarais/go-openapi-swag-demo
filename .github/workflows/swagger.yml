@@ -1,10 +1,14 @@
 name: Swagger
-on: [push]
+on: #[push] <---- If you want to run on every commit, we've opted to just run on PR merges into main
+  push:
+    branches:
+      - master
 jobs:
   documentation:
     name: Documentation
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/setup-node@v2-beta
       - uses: actions/setup-go@v2
         with:
           go-version: 1.15
@@ -12,15 +16,19 @@ jobs:
       - run: go mod download
       - run: go get -u github.com/swaggo/swag/cmd/swag
       - run: swag init -g pkg/router/router.go
-      - run: mkdir output && cp docs/swagger.yaml output/${{ github.event.repository.name }}.yaml
-      # force push into ui repo via this action
-      - name: Pushes to another repository
-        uses: cpina/github-action-push-to-another-repository@v1.2
-        env:
-          API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
+
+      # Run prettier before sending the file upstream
+      - run: yarn
+      - run: yarn format
+
+      # We only need the yaml file as a deliverable
+      - run: mkdir output && cp docs/swagger.yaml output/go-openapi-swag-demo.yaml
+
+      - name: Push to API Docs UI Repo
+        uses: plocket/push-generated-file@cec9c793084db387e5c0cf9a108d0f90153b27ce
         with:
-          source-directory: 'output'
-          destination-github-username: 'etiennemarais'
-          destination-repository-name: 'go-openapi-swag-ui-demo'
-          target-branch: 'main'
-          user-email: hello@etiennemarais.co.za
+          token: ${{ secrets.API_TOKEN_GITHUB }}
+          source_file_path: "output"
+          destination_repo: "etiennemarais/go-openapi-swag-ui-demo"
+          destination_folder: "services"
+          target_branch: "main"
