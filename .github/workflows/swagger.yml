@@ -2,7 +2,7 @@ name: Swagger
 on: #[push] <---- If you want to run on every commit, we've opted to just run on PR merges into main
   push:
     branches:
-      - master
+      - main
 jobs:
   documentation:
     name: Documentation
